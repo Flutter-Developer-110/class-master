@@ -49,24 +49,55 @@ class _SignInState extends State<SignInScreen> {
                   'Sign in Please!',
                   style:TextStyle(fontFamily: 'RockSalt',fontSize: 24.0), 
                 ),
+                const SizedBox(height: 20),
                 TextFormField(
                   decoration: InputDecoration(
-                    hintText: 'Email address',
+                    hintText: 'Enter Email',
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(
+                        color: Colors.purpleAccent,
+                        width: 1,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(
+                        color: kLavender,
+                        width: 1,
+                      ),
+                    ),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   autocorrect: false,
                   validator: con.validateEmail,
                   onSaved: con.saveEmail,
                 ),
+                const SizedBox(height: 10),
                 TextFormField(
                   decoration: InputDecoration(
                     hintText: 'Enter Password',
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(
+                        color: Colors.purpleAccent,
+                        width: 1,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(
+                        color: kLavender,
+                        width: 1,
+                      ),
+                    ),
                   ),
                   obscureText: true,
                   autocorrect: false,
                   validator: con.validatePassword,
                   onSaved: con.savePassword,
                 ),
+                const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: con.signIn,
                   child: Text(

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lesson3/controller/firebaseauth_controller.dart';
 import 'package:lesson3/model/constant.dart';
 import 'package:lesson3/viewscreen/view/mydialog.dart';
@@ -41,31 +42,78 @@ class _SignUpState extends State<SignUpScreen> {
               children: [
                 Text(
                   'Create an account',
-                  style: Theme.of(context).textTheme.headline5,
-                ),
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ), 
+                const SizedBox(height: 20),
                 TextFormField(
                   decoration: InputDecoration(
                     hintText: 'Enter email',
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(
+                        color: Colors.purpleAccent,
+                        width: 1,
+                      ),
+                    ), 
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(
+                        color: kLavender,
+                        width: 1,
+                      ),
+                    ),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   autocorrect: false,
                   validator: con.validateEmail,
                   onSaved: con.saveEmail,
                 ),
+                const SizedBox(height: 10),
                 TextFormField(
                   decoration: InputDecoration(
-                    hintText:'Enter Password' ,
-
+                    hintText: 'Enter Password',
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(
+                        color: Colors.purpleAccent,
+                        width: 1,
+                      ),
                     ),
-                    autocorrect: false,
-                    obscureText: true,
-                    validator: con.validatePassword,
-                    onSaved: con.savePassword,
-
-                ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(
+                        color: kLavender,
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  autocorrect: false,
+                  obscureText: true,
+                  validator: con.validatePassword,
+                  onSaved: con.savePassword,
+                ), 
+                const SizedBox(height: 10), 
                 TextFormField(
                   decoration: InputDecoration(
-                    hintText: 'Confirm password'
+                    hintText: 'Confirm password',
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(
+                        color: Colors.purpleAccent,
+                        width: 1,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(
+                        color: kLavender,
+                        width: 1,
+                      ),
+                    ),
                   ),
                   autocorrect: false,
                   obscureText: true,
@@ -74,7 +122,10 @@ class _SignUpState extends State<SignUpScreen> {
                 ),
                 ElevatedButton(
                   onPressed: con.signUp,
-                  child: Text('Sign up ',style: Theme.of(context).textTheme.button,),
+                  child: Text(
+                    'Sign up ',
+                    style: Theme.of(context).textTheme.button,
+                  ),
                 ),
               ],
             ),
@@ -87,69 +138,64 @@ class _SignUpState extends State<SignUpScreen> {
 
 class _Controller {
   late _SignUpState state;
- String ? email;
- String ? password;
- String ? passwordConfirm;
-
+  String? email;
+  String? password;
+  String? passwordConfirm;
 
   _Controller(this.state);
 
   void signUp() async {
-
-    FormState ? currentState =state.formKey.currentState;
+    FormState? currentState = state.formKey.currentState;
     if (currentState == null || !currentState.validate()) return;
     currentState.save();
 
-    if (password != passwordConfirm){
+    if (password != passwordConfirm) {
       MyDialog.showSnackBar(
         context: state.context,
-        message:  'password and confirm do not match',
+        message: 'password and confirm do not match',
         seconds: 15,
-      
       );
       return;
     }
-    try{
-       await FirebaseAuthController.createAccount(email: email!,password: password!);
-       MyDialog.showSnackBar(
-         context: state.context,
-         message: 'Account created! Sign in to use the app ',
-       );
-    }catch(e){
-       if(Constant.DEV) print('========== create account error: $e');
-       MyDialog.showSnackBar(
-         context: state.context,
-         message: 'Cannot create account:$e',
-       );
+    try {
+      await FirebaseAuthController.createAccount(
+          email: email!, password: password!);
+      MyDialog.showSnackBar(
+        context: state.context,
+        message: 'Account created! Sign in to use the app ',
+      );
+    } catch (e) {
+      if (Constant.DEV) print('========== create account error: $e');
+      MyDialog.showSnackBar(
+        context: state.context,
+        message: 'Cannot create account:$e',
+      );
     }
-
   }
 
-
-  String? validateEmail(String? value){
-    if(value == null || !(value.contains('.')&& value.contains('@')))
-    return'Invalid email address';
+  String? validateEmail(String? value) {
+    if (value == null || !(value.contains('.') && value.contains('@')))
+      return 'Invalid email address';
     else
-    return null;
+      return null;
   }
 
-  String ? validatePassword(String ? value){
-    if (value== null || value.length <6)
-    return 'password too short';
+  String? validatePassword(String? value) {
+    if (value == null || value.length < 6)
+      return 'password too short';
     else
-    return null;
+      return null;
   }
 
-  void saveEmail(String ? value){
-    email=value;
-
+  void saveEmail(String? value) {
+    email = value;
   }
 
-  void savePassword(String ? value){
-    password=value;
+  void savePassword(String? value) {
+    password = value;
   }
 
-  void saveConfirmPassword(String ? value){
-     passwordConfirm =value;
+  void saveConfirmPassword(String? value) {
+    passwordConfirm = value;
   }
 }

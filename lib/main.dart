@@ -18,7 +18,7 @@ class Lesson3App extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
    return MaterialApp(
-     debugShowCheckedModeBanner: Constant.DEV,
+     debugShowCheckedModeBanner: false,
      theme: ThemeData(
        brightness: Constant.DARKMODE ? Brightness.dark : Brightness.light,
        primaryColor: Colors.blueAccent,

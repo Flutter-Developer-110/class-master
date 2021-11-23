@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 class CustomizedTextField extends StatelessWidget {
   final String hintText;
-  final String labelText;
-  final TextEditingController controller;
+  final String labelText; 
   final bool isPassword;
   final IconData suffixIcon;
   final VoidCallback iconPressed;
@@ -11,8 +10,7 @@ class CustomizedTextField extends StatelessWidget {
   const CustomizedTextField({
     Key? key,
     required this.hintText,
-    required this.labelText,
-    required this.controller,
+    required this.labelText, 
     required this.isPassword,
     required this.suffixIcon,
     required this.iconPressed,
@@ -20,8 +18,7 @@ class CustomizedTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
+    return TextField( 
       obscureText: isPassword,
       decoration: InputDecoration(
         hintText: hintText,
