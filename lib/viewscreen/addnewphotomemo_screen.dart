@@ -54,31 +54,33 @@ class _AddNewPhotoMemoState extends State<AddNewPhotoMemoScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
+              SizedBox(height: 10),
               Stack(
                 children: [
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.35,
-                    child: photo == null
-                        ? FittedBox(
-                            child: Icon(
-                              Icons.photo_library,
-                            ),
-                          )
-                        : Image.file(photo!),
+                  CircleAvatar(
+                    radius: 70,
+                    backgroundColor: Colors.yellow,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.white,
+                      radius: 67,
+                      backgroundImage: photo != null ? FileImage(photo!) : AssetImage('assets/images/default.png' ) as ImageProvider,
+                    ),
                   ),
                   Positioned(
                     right: 0.0,
                     bottom: 0.0,
-                    child: Container(
-                      color: Colors.blue[200],
+                    child: CircleAvatar(
+                      radius: 25,
+                      backgroundColor: Colors.blueAccent,
                       child: PopupMenuButton(
+                        icon: Icon(Icons.photo, color: Colors.white),
                         onSelected: con.getPhoto,
                         itemBuilder: (context) => [
                           for (var source in PhotoSource.values)
                             PopupMenuItem(
                               value: source,
                               child: Text('${source.toString().split('.')[1]}'),
-                            )
+                            ),
                         ],
                       ),
                     ),
@@ -93,27 +95,58 @@ class _AddNewPhotoMemoState extends State<AddNewPhotoMemoScreen> {
                       con.progressMessage!,
                       style: Theme.of(context).textTheme.headline6,
                     ),
-              TextFormField(
-                decoration: InputDecoration(hintText: 'Title'),
-                autocorrect: true,
-                validator: PhotoMemo.validateTitle,
-                onSaved: con.saveTitle,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    hintText: 'Title',
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  autocorrect: true,
+                  validator: PhotoMemo.validateTitle,
+                  onSaved: con.saveTitle,
+                ),
               ),
-              TextFormField(
-                decoration: InputDecoration(hintText: 'Memo'),
-                autocorrect: true,
-                keyboardType: TextInputType.multiline,
-                maxLines: 6,
-                validator: PhotoMemo.validateMemo,
-                onSaved: con.saveMemo,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    hintText: 'Memo',
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  autocorrect: true,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: 6,
+                  validator: PhotoMemo.validateMemo,
+                  onSaved: con.saveMemo,
+                ),
               ),
-              TextFormField(
-                decoration: InputDecoration(
-                    hintText: 'Shared with(comma separated list)'),
-                keyboardType: TextInputType.emailAddress,
-                maxLines: 2,
-                validator: PhotoMemo.validateSharedWith,
-                onSaved: con.saveSharedWith,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      hintText: 'Shared with(comma separated list)'),
+                  keyboardType: TextInputType.emailAddress,
+                  maxLines: 2,
+                  validator: PhotoMemo.validateSharedWith,
+                  onSaved: con.saveSharedWith,
+                ),
               ),
             ],
           ),
@@ -141,9 +174,8 @@ class _Controller {
       );
       return;
     }
-     
-     MyDialog.circularProgressStart(state.context);
 
+    MyDialog.circularProgressStart(state.context);
 
     try {
       Map photoInfo = await CloudStorageController.uploadPhotoFile(
@@ -159,21 +191,22 @@ class _Controller {
         },
       );
       //get image labels by ML
-      List<String> recognitions =await GoogleMLController.getImageLabels(photo: state.photo!);
+      List<String> recognitions =
+          await GoogleMLController.getImageLabels(photo: state.photo!);
       tempMemo.imageLabels.addAll(recognitions);
       tempMemo.photoFilename = photoInfo[ARGS.Filename];
       tempMemo.photoURL = photoInfo[ARGS.DownloadURL];
       tempMemo.createdBy = state.widget.user.email!;
       tempMemo.timestamp = DateTime.now();
 
+      String docId =
+          await FirestoreController.addPhotoMemo(photoMemo: tempMemo);
+      tempMemo.docId = docId;
+      state.widget.photoMemoList.insert(0, tempMemo);
 
-     String docId = await FirestoreController.addPhotoMemo(photoMemo:tempMemo);
-     tempMemo.docId = docId;
-       state.widget.photoMemoList.insert(0, tempMemo);
- 
-       MyDialog.circularProgressStop(state.context);
+      MyDialog.circularProgressStop(state.context);
 
-       Navigator.pop(state.context);
+      Navigator.pop(state.context);
 
       //print('======= photo filename: ${photoInfo[ARGS.Filename]}');
       //print('======= photo URL: ${photoInfo[ARGS.DownloadURL]}');

@@ -65,36 +65,39 @@ class _DetailedViewState extends State<DetailedViewScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
+              SizedBox(height: 20),
               Stack(
                 children: [
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.35,
-                    child: con.photo == null
-                        ? WebImage(
-                            url: con.tempMemo.photoURL,
-                            context: context,
-                          )
-                        : Image.file(con.photo!),
-                  ),
+                  CircleAvatar(
+                    radius: 70,
+                    backgroundColor: Colors.yellow,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.white,
+                        radius: 67,
+                        backgroundImage: con.photo == null
+                            ? AssetImage('assets/images/default.png')
+                            : FileImage(con.photo!) as ImageProvider),
+                  ), 
                   editMode
                       ? Positioned(
-                          right: 0.0,
-                          bottom: 0.0,
-                          child: Container(
-                            color: Colors.blue,
-                            child: PopupMenuButton(
-                              onSelected: con.getPhoto,
-                              itemBuilder: (context) => [
-                                for (var source in PhotoSource.values)
-                                  PopupMenuItem<PhotoSource>(
-                                    value: source,
-                                    child: Text(
-                                        '${source.toString().split('.')[1]}'),
-                                  )
-                              ],
+                    right: 0.0,
+                    bottom: 0.0,
+                    child: CircleAvatar(
+                      radius: 25,
+                      backgroundColor: Colors.blueAccent,
+                      child: PopupMenuButton(
+                        icon: Icon(Icons.photo, color: Colors.white),
+                        onSelected: con.getPhoto,
+                        itemBuilder: (context) => [
+                          for (var source in PhotoSource.values)
+                            PopupMenuItem(
+                              value: source,
+                              child: Text('${source.toString().split('.')[1]}'),
                             ),
-                          ),
-                        )
+                        ],
+                      ),
+                    ),
+                  )
                       : SizedBox(
                           height: 1.0,
                         ),
@@ -108,46 +111,75 @@ class _DetailedViewState extends State<DetailedViewScreen> {
                       progressMessage!,
                       style: Theme.of(context).textTheme.headline6,
                     ),
-              TextFormField(
-                enabled: editMode,
-                style: Theme.of(context).textTheme.headline6,
-                decoration: InputDecoration(
-                  hintText: 'Enter Title',
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  enabled: editMode,
+                  style: Theme.of(context).textTheme.headline6,
+                  decoration: InputDecoration(
+                      hintText: 'Enter Title',
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                  initialValue: con.tempMemo.title,
+                  autocorrect: true,
+                  validator: PhotoMemo.validateTitle,
+                  onSaved: con.saveTitle,
                 ),
-                initialValue: con.tempMemo.title,
-                autocorrect: true,
-                validator: PhotoMemo.validateTitle,
-                onSaved: con.saveTitle,
               ),
-              TextFormField(
-                enabled: editMode,
-                style: Theme.of(context).textTheme.bodyText1,
-                decoration: InputDecoration(
-                  hintText: 'Enter Memo',
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  enabled: editMode,
+                  style: Theme.of(context).textTheme.bodyText1,
+                  decoration: InputDecoration(
+                      hintText: 'Enter Memo',
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                  initialValue: con.tempMemo.memo,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: 6,
+                  autocorrect: true,
+                  validator: PhotoMemo.validateMemo,
+                  onSaved: con.saveMemo,
                 ),
-                initialValue: con.tempMemo.memo,
-                keyboardType: TextInputType.multiline,
-                maxLines: 6,
-                autocorrect: true,
-                validator: PhotoMemo.validateMemo,
-                onSaved: con.saveMemo,
               ),
-              TextFormField(
-                enabled: editMode,
-                style: Theme.of(context).textTheme.bodyText1,
-                decoration: InputDecoration(
-                  hintText: 'Enter sharedWith email list',
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  enabled: editMode,
+                  style: Theme.of(context).textTheme.bodyText1,
+                  decoration: InputDecoration(
+                      hintText: 'Enter shared with Email list',
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                  initialValue: con.tempMemo.sharedWith.join(','),
+                  keyboardType: TextInputType.multiline,
+                  maxLines: 6,
+                  autocorrect: false,
+                  validator: PhotoMemo.validateSharedWith,
+                  onSaved: con.saveSharedWith,
                 ),
-                initialValue: con.tempMemo.sharedWith.join(','),
-                keyboardType: TextInputType.multiline,
-                maxLines: 6,
-                autocorrect: false,
-                validator: PhotoMemo.validateSharedWith,
-                onSaved: con.saveSharedWith,
               ),
-              Constant.DEV ? Text(
-                'Image Labels by ML\n${con.tempMemo.imageLabels}'
-              ) : SizedBox(height: 1.0,),
+              Constant.DEV
+                  ? Text('Image Labels by ML\n${con.tempMemo.imageLabels}')
+                  : SizedBox(
+                      height: 1.0,
+                    ),
             ],
           ),
         ),
@@ -194,18 +226,19 @@ class _Controller {
           uid: state.widget.user.uid,
           filename: tempMemo.photoFilename,
           listener: (int progress) {
-            state.render((){
-              state.progressMessage = progress == 100 ? null:
-               'Uploading: $progress %';
+            state.render(() {
+              state.progressMessage =
+                  progress == 100 ? null : 'Uploading: $progress %';
             });
           },
         );
         //generate image lables by Ml
-        List<String> recognitions = await GoogleMLController.getImageLabels(photo: photo!);
-        tempMemo.imageLabels= recognitions;
+        List<String> recognitions =
+            await GoogleMLController.getImageLabels(photo: photo!);
+        tempMemo.imageLabels = recognitions;
         tempMemo.photoURL = photoInfo[ARGS.DownloadURL];
         updateInfo[PhotoMemo.PHOTO_URL] = tempMemo.photoURL;
-        updateInfo[PhotoMemo.IMAGE_LABELS]=tempMemo.imageLabels;
+        updateInfo[PhotoMemo.IMAGE_LABELS] = tempMemo.imageLabels;
       }
       //update Firestore doc
       if (tempMemo.title != state.widget.photoMemo.title)
@@ -235,7 +268,7 @@ class _Controller {
         message: 'Upsate Photomemo error. $e',
       );
     }
-   // state.render(() => state.editMode = false);
+    // state.render(() => state.editMode = false);
   }
 
   void edit() {

@@ -20,6 +20,7 @@ class SignInScreen extends StatefulWidget {
 class _SignInState extends State<SignInScreen> {
   late _Controller con;
   GlobalKey<FormState> formkey = GlobalKey<FormState>();
+  FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -43,11 +44,11 @@ class _SignInState extends State<SignInScreen> {
               children: [
                 Text(
                   'PhotoMemo',
-                  style: TextStyle(fontFamily: 'RockSalt',fontSize: 40.0),
+                  style: TextStyle(fontFamily: 'RockSalt', fontSize: 40.0),
                 ),
                 Text(
                   'Sign in Please!',
-                  style:TextStyle(fontFamily: 'RockSalt',fontSize: 24.0), 
+                  style: TextStyle(fontFamily: 'RockSalt', fontSize: 24.0),
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
@@ -105,18 +106,23 @@ class _SignInState extends State<SignInScreen> {
                     style: Theme.of(context).textTheme.button,
                   ),
                 ),
-                SizedBox(height: 20.0,),
+                SizedBox(
+                  height: 20.0,
+                ),
                 ElevatedButton(
-                  onPressed:con.signUp ,
-                  child:Text('Create a new account',style: Theme.of(context).textTheme.button,),
+                  onPressed: con.signUp,
+                  child: Text(
+                    'Create a new account',
+                    style: Theme.of(context).textTheme.button,
                   ),
+                ),
               ],
             ),
           ),
         ),
       ),
     );
-  }      
+  }
 }
 
 class _Controller {
@@ -125,10 +131,9 @@ class _Controller {
   String? email;
   String? password;
 
-  void signUp(){
+  void signUp() {
     Navigator.pushNamed(state.context, SignUpScreen.routeName);
   }
-
 
   String? validateEmail(String? value) {
     if (value == null || !(value.contains('.') && value.contains('@')))
@@ -166,16 +171,17 @@ class _Controller {
       user = await FirebaseAuthController.signIn(
           email: email!, password: password!);
       //print('========= ${user?.email}');
-      List<PhotoMemo> photoMemoList=await FirestoreController.getPhotoMemoList(email: email!);
-      
+      List<PhotoMemo> photoMemoList =
+          await FirestoreController.getPhotoMemoList(email: email!);
+
       MyDialog.circularProgressStop(state.context);
 
       Navigator.pushNamed(
         state.context,
         UserHomeScreen.routeName,
         arguments: {
-          ARGS.USER:user,
-          ARGS.PhotoMemoList:photoMemoList, 
+          ARGS.USER: user,
+          ARGS.PhotoMemoList: photoMemoList,
         },
       );
     } catch (e) {

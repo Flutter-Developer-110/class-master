@@ -20,8 +20,7 @@ class Lesson3App extends StatelessWidget{
    return MaterialApp(
      debugShowCheckedModeBanner: false,
      theme: ThemeData(
-       brightness: Constant.DARKMODE ? Brightness.dark : Brightness.light,
-       primaryColor: Colors.blueAccent,
+       brightness: Constant.DARKMODE ? Brightness.dark : Brightness.light, 
      ),
      initialRoute: SignInScreen.routeName ,
      routes: {
