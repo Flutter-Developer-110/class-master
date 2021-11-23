@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "23404839714",
+    "project_id": "cs5303-gunjanm-lesson3",
+    "storage_bucket": "cs5303-gunjanm-lesson3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:23404839714:android:af93d7386888fe06675b7b",
+        "android_client_info": {
+          "package_name": "edu.uco.gmalviya.cmsc5303.lesson3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "23404839714-78ldtnk087q0e0uc2agpsris7sqce1h3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtuV8XH20JUeUshCkrSuwbS4Bas4qXvxc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "23404839714-78ldtnk087q0e0uc2agpsris7sqce1h3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
