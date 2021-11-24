@@ -2,6 +2,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lesson3/controller/cloudstorage_controller.dart';
 import 'package:lesson3/controller/firebaseauth_controller.dart';
 import 'package:lesson3/controller/firestore_controller.dart';
@@ -45,8 +46,7 @@ class _UserHomeState extends State<UserHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () =>
-          Future.value(false), //disable Android system back button
+      onWillPop: () => Future.value(false), //disable Android system back button
       child: Scaffold(
           appBar: AppBar(
             //title: Text('User Home'),
@@ -118,7 +118,8 @@ class _UserHomeState extends State<UserHomeScreen> {
               : ListView.builder(
                   itemCount: con.photoMemoList.length,
                   itemBuilder: (context, index) {
-                    return Container(
+                    return Card(
+                      margin: const EdgeInsets.all(8.0),
                       color: con.delIndexes.contains(index)
                           ? Theme.of(context).highlightColor
                           : Theme.of(context).scaffoldBackgroundColor,
@@ -142,11 +143,26 @@ class _UserHomeState extends State<UserHomeScreen> {
                                   : con.photoMemoList[index].memo,
                             ),
                             Text(
-                                'Created by:${con.photoMemoList[index].createdBy}'),
+                              'Created by : ${con.photoMemoList[index].createdBy}',
+                              style: GoogleFonts.inter(
+                                color: Colors.green,
+                                fontSize: 14,
+                              ),
+                            ),
                             Text(
-                                'SharedWith:${con.photoMemoList[index].sharedWith}'),
+                              'SharedWith : ${con.photoMemoList[index].sharedWith}',
+                              style: GoogleFonts.inter(
+                                color: Colors.red,
+                                fontSize: 14,
+                              ),
+                            ),
                             Text(
-                                'Timestamp:${con.photoMemoList[index].timestamp}'),
+                              'Timestamp : ${con.photoMemoList[index].timestamp}',
+                              style: GoogleFonts.inter(
+                                color: Colors.yellow,
+                                fontSize: 14,
+                              ),
+                            ),
                           ],
                         ),
                         onTap: () => con.onTap(index),
@@ -176,17 +192,14 @@ class _Controller {
       List<PhotoMemo> photoMemoList =
           await FirestoreController.getPhotoMemoListSharedWith(
               email: state.widget.email);
-      await Navigator.pushNamed(
-        state.context,
-        SharedWithScreen.routeName,
-        arguments: {
-          ARGS.PhotoMemoList:photoMemoList,
-          ARGS.USER:state.widget.user,
-        }
-      );
-      Navigator.of(state.context).pop();//close the drawer
+      await Navigator.pushNamed(state.context, SharedWithScreen.routeName,
+          arguments: {
+            ARGS.PhotoMemoList: photoMemoList,
+            ARGS.USER: state.widget.user,
+          });
+      Navigator.of(state.context).pop(); //close the drawer
     } catch (e) {
-      if(Constant.DEV) print('========= sharedWith error: $e');
+      if (Constant.DEV) print('========= sharedWith error: $e');
       MyDialog.showSnackBar(
         context: state.context,
         message: 'Failed to get sharedWith list: $e',

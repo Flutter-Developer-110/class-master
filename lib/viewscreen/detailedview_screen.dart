@@ -75,7 +75,7 @@ class _DetailedViewState extends State<DetailedViewScreen> {
                       backgroundColor: Colors.white,
                         radius: 67,
                         backgroundImage: con.photo == null
-                            ? AssetImage('assets/images/default.png')
+                            ? WebImage()
                             : FileImage(con.photo!) as ImageProvider),
                   ), 
                   editMode
