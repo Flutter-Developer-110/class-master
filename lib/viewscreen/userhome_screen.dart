@@ -120,6 +120,7 @@ class _UserHomeState extends State<UserHomeScreen> {
                   itemBuilder: (context, index) {
                     return Card(
                       margin: const EdgeInsets.all(8.0),
+                      elevation: 10,
                       color: con.delIndexes.contains(index)
                           ? Theme.of(context).highlightColor
                           : Theme.of(context).scaffoldBackgroundColor,

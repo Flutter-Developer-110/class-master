@@ -73,31 +73,41 @@ class _DetailedViewState extends State<DetailedViewScreen> {
                     backgroundColor: Colors.yellow,
                     child: CircleAvatar(
                       backgroundColor: Colors.white,
-                        radius: 67,
-                        backgroundImage: con.photo == null
-                            ? WebImage()
-                            : FileImage(con.photo!) as ImageProvider),
-                  ), 
+                      radius: 67,
+                      child: con.photo == null
+                          ? WebImage(
+                              url: con.tempMemo.photoURL,
+                              context: context,
+                              height: 100,
+                            )
+                          : Image.file(
+                              con.photo!,
+                              width: 120,
+                              height: 120,
+                            )
+                    ),
+                  ),
                   editMode
                       ? Positioned(
-                    right: 0.0,
-                    bottom: 0.0,
-                    child: CircleAvatar(
-                      radius: 25,
-                      backgroundColor: Colors.blueAccent,
-                      child: PopupMenuButton(
-                        icon: Icon(Icons.photo, color: Colors.white),
-                        onSelected: con.getPhoto,
-                        itemBuilder: (context) => [
-                          for (var source in PhotoSource.values)
-                            PopupMenuItem(
-                              value: source,
-                              child: Text('${source.toString().split('.')[1]}'),
+                          right: 0.0,
+                          bottom: 0.0,
+                          child: CircleAvatar(
+                            radius: 25,
+                            backgroundColor: Colors.blueAccent,
+                            child: PopupMenuButton(
+                              icon: Icon(Icons.photo, color: Colors.white),
+                              onSelected: con.getPhoto,
+                              itemBuilder: (context) => [
+                                for (var source in PhotoSource.values)
+                                  PopupMenuItem(
+                                    value: source,
+                                    child: Text(
+                                        '${source.toString().split('.')[1]}'),
+                                  ),
+                              ],
                             ),
-                        ],
-                      ),
-                    ),
-                  )
+                          ),
+                        )
                       : SizedBox(
                           height: 1.0,
                         ),
@@ -117,14 +127,14 @@ class _DetailedViewState extends State<DetailedViewScreen> {
                   enabled: editMode,
                   style: Theme.of(context).textTheme.headline6,
                   decoration: InputDecoration(
-                      hintText: 'Enter Title',
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
+                    hintText: 'Enter Title',
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
                     ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
                   initialValue: con.tempMemo.title,
                   autocorrect: true,
                   validator: PhotoMemo.validateTitle,
@@ -137,14 +147,14 @@ class _DetailedViewState extends State<DetailedViewScreen> {
                   enabled: editMode,
                   style: Theme.of(context).textTheme.bodyText1,
                   decoration: InputDecoration(
-                      hintText: 'Enter Memo',
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
+                    hintText: 'Enter Memo',
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
                     ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
                   initialValue: con.tempMemo.memo,
                   keyboardType: TextInputType.multiline,
                   maxLines: 6,
@@ -159,14 +169,14 @@ class _DetailedViewState extends State<DetailedViewScreen> {
                   enabled: editMode,
                   style: Theme.of(context).textTheme.bodyText1,
                   decoration: InputDecoration(
-                      hintText: 'Enter shared with Email list',
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
+                    hintText: 'Enter shared with Email list',
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
                     ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
                   initialValue: con.tempMemo.sharedWith.join(','),
                   keyboardType: TextInputType.multiline,
                   maxLines: 6,
