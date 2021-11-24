@@ -12,10 +12,10 @@ class InternalErrorScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Internal Errot'),
+        title: Text('Internal Error'),
       ),
       body: Text(
-        'Internal Error has occured\n Re-launch the app\n$message',
+        'Internal Error has occurred\n Re-launch the app\n$message',
         style: TextStyle(
           fontSize:18.0,
           color: Colors.red,

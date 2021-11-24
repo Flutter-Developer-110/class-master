@@ -19,13 +19,13 @@ class SharedWithScreen extends StatefulWidget {
 }
 
 class _SharedWithState extends State<SharedWithScreen> {
-  late _Controler con;
+  late _Controller con;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    con = _Controler(this);
+    con = _Controller(this);
   }
 
   void render(fn) => setState(fn);
@@ -37,7 +37,10 @@ class _SharedWithState extends State<SharedWithScreen> {
       ),
       body: SingleChildScrollView(
         child: widget.photoMemoList.isEmpty
-            ? Text('No PhotoMemos shared with me',style: Theme.of(context).textTheme.headline6,)
+            ? Text(
+                'No PhotoMemos shared with me',
+                style: Theme.of(context).textTheme.headline6,
+              )
             : Column(
                 children: [
                   for (var photoMemo in widget.photoMemoList)
@@ -64,6 +67,7 @@ class _SharedWithState extends State<SharedWithScreen> {
                           Text('Created at: ${photoMemo.timestamp}'),
                           Text('Shared With: ${photoMemo.sharedWith}'),
                           Text('Image Labels: ${photoMemo.imageLabels}'),
+                          IconButton(onPressed: con.comment,icon: Icon(Icons.comment_rounded),)
                         ],
                       ),
                     )
@@ -74,7 +78,11 @@ class _SharedWithState extends State<SharedWithScreen> {
   }
 }
 
-class _Controler {
-  late _SharedWithState state;
-  _Controler(this.state);
+class _Controller {
+  late _SharedWithState state; 
+  _Controller(this.state); 
+
+  void comment(){
+    Navigator.pushNamed(context, routeName)
+  }
 }

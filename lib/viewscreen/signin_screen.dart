@@ -20,7 +20,6 @@ class SignInScreen extends StatefulWidget {
 class _SignInState extends State<SignInScreen> {
   late _Controller con;
   GlobalKey<FormState> formkey = GlobalKey<FormState>();
-  FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -172,8 +171,8 @@ class _Controller {
           email: email!, password: password!);
       //print('========= ${user?.email}');
       List<PhotoMemo> photoMemoList =
-          await FirestoreController.getPhotoMemoList(email: email!);
-
+          await FirestoreController.getPhotoMemoList(email: email!); 
+          
       MyDialog.circularProgressStop(state.context);
 
       Navigator.pushNamed(

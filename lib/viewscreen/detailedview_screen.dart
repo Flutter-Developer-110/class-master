@@ -272,10 +272,10 @@ class _Controller {
       state.render(() => state.editMode = false);
     } catch (e) {
       MyDialog.circularProgressStop(state.context);
-      if (Constant.DEV) print('========= update photomemo error: $e');
+      if (Constant.DEV) print('========= update photo memo error: $e');
       MyDialog.showSnackBar(
         context: state.context,
-        message: 'Upsate Photomemo error. $e',
+        message: 'Update Photo memo error. $e',
       );
     }
     // state.render(() => state.editMode = false);
