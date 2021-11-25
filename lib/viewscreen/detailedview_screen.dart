@@ -1,7 +1,7 @@
-//import 'dart:html';
+
 
 import 'dart:io';
-//import 'dart:js';
+
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -242,7 +242,7 @@ class _Controller {
             });
           },
         );
-        //generate image lables by Ml
+        //generate image labels by Ml
         List<String> recognitions =
             await GoogleMLController.getImageLabels(photo: photo!);
         tempMemo.imageLabels = recognitions;
