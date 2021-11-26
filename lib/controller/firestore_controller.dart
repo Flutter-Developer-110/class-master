@@ -63,7 +63,7 @@ class FirestoreController {
     String timestamp = DateTime.now().toString();
     newMap['timestamp'] = timestamp;
     newMap['sender'] = FirebaseAuth.instance.currentUser!.email;
-    newMap['receiver'] = photoMemoList[index].createdBy; 
+    newMap['receiver'] = photoMemoList[index].sharedWith; 
     commentsRef.add(newMap).then((value) {
       print(value);
     });

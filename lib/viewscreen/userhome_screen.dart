@@ -13,6 +13,7 @@ import 'package:lesson3/viewscreen/addnewphotomemo_screen.dart';
 import 'package:lesson3/viewscreen/detailedview_screen.dart';
 import 'package:lesson3/viewscreen/sharedwith_screen.dart';
 import 'package:lesson3/viewscreen/view/mydialog.dart';
+import 'package:lesson3/viewscreen/view/replies_comments.dart';
 import 'package:lesson3/viewscreen/view/webimage.dart';
 
 class UserHomeScreen extends StatefulWidget {
@@ -38,6 +39,9 @@ class _UserHomeState extends State<UserHomeScreen> {
   Stream<QuerySnapshot> comments =
       FirebaseFirestore.instance.collection('comments').snapshots();
 
+  Stream<QuerySnapshot> replies =
+      FirebaseFirestore.instance.collection('replies').snapshots();
+
   late TextEditingController commentController;
   @override
   void initState() {
@@ -62,260 +66,272 @@ class _UserHomeState extends State<UserHomeScreen> {
     return WillPopScope(
       onWillPop: () => Future.value(false), //disable Android system back button
       child: Scaffold(
-          appBar: AppBar(
-            //title: Text('User Home'),
-            actions: [
-              con.delIndexes.isEmpty
-                  ? Form(
-                      key: formKey,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 6.0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.7,
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              hintText: 'Search (empty for all)',
-                              fillColor: Theme.of(context).backgroundColor,
-                              filled: true,
-                            ),
-                            autocorrect: true,
-                            onSaved: con.saveSearchKey,
+        appBar: AppBar(
+          //title: Text('User Home'),
+          actions: [
+            con.delIndexes.isEmpty
+                ? Form(
+                    key: formKey,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 6.0),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        child: TextFormField(
+                          decoration: InputDecoration(
+                            hintText: 'Search (empty for all)',
+                            fillColor: Theme.of(context).backgroundColor,
+                            filled: true,
                           ),
+                          autocorrect: true,
+                          onSaved: con.saveSearchKey,
                         ),
                       ),
-                    )
-                  : IconButton(
-                      icon: Icon(Icons.cancel),
-                      onPressed: con.cancelDelete,
                     ),
-              con.delIndexes.isEmpty
-                  ? IconButton(
-                      onPressed: con.search,
-                      icon: Icon(Icons.search),
-                    )
-                  : IconButton(
-                      onPressed: con.delete,
-                      icon: Icon(
-                        Icons.delete,
-                      )),
+                  )
+                : IconButton(
+                    icon: Icon(Icons.cancel),
+                    onPressed: con.cancelDelete,
+                  ),
+            con.delIndexes.isEmpty
+                ? IconButton(
+                    onPressed: con.search,
+                    icon: Icon(Icons.search),
+                  )
+                : IconButton(
+                    onPressed: con.delete,
+                    icon: Icon(
+                      Icons.delete,
+                    )),
+          ],
+        ),
+        drawer: Drawer(
+          child: ListView(
+            children: [
+              UserAccountsDrawerHeader(
+                accountName: Text(widget.displayName),
+                accountEmail: Text(widget.email),
+              ),
+              ListTile(
+                leading: Icon(Icons.people),
+                title: Text('Shared with'),
+                onTap: con.sharedWith,
+              ),
+              ListTile(
+                leading: Icon(Icons.exit_to_app),
+                title: Text('Sign Out'),
+                onTap: con.signOut,
+              ),
+              ListTile(
+                  leading: Icon(Icons.comment),
+                  title: Text('Comment & Replies'),
+                  onTap: () {
+                    con.goRepliesPage();
+                  }),
             ],
           ),
-          drawer: Drawer(
-            child: ListView(
-              children: [
-                UserAccountsDrawerHeader(
-                  accountName: Text(widget.displayName),
-                  accountEmail: Text(widget.email),
-                ),
-                ListTile(
-                  leading: Icon(Icons.people),
-                  title: Text('Shared with'),
-                  onTap: con.sharedWith,
-                ),
-                ListTile(
-                  leading: Icon(Icons.exit_to_app),
-                  title: Text('Sign Out'),
-                  onTap: con.signOut,
-                ),
-              ],
-            ),
-          ),
-          floatingActionButton: FloatingActionButton(
-            child: Icon(Icons.add),
-            onPressed: con.addButton,
-          ),
-          body: con.photoMemoList.isEmpty
-              ? Text(
-                  'No Photo Memo Found',
-                  style: Theme.of(context).textTheme.headline6,
-                )
-              : ListView.builder(
-                  itemCount: con.photoMemoList.length,
-                  itemBuilder: (context, index) {
-                    return Card(
-                      margin: const EdgeInsets.all(8.0),
-                      elevation: 10,
-                      color: con.delIndexes.contains(index)
-                          ? Theme.of(context).highlightColor
-                          : Theme.of(context).scaffoldBackgroundColor,
-                      child: ListTile(
-                        leading: WebImage(
-                          url: con.photoMemoList[index].photoURL,
-                          context: context,
-                        ),
-                        trailing: Icon(Icons.arrow_right),
-                        title: Text(con.photoMemoList[index].title),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              con.photoMemoList[index].memo.length >= 40
-                                  ? con.photoMemoList[index].memo.substring(
-                                        0,
-                                        40,
-                                      ) +
-                                      '...'
-                                  : con.photoMemoList[index].memo,
+        ),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: con.addButton,
+        ),
+        body: con.photoMemoList.isEmpty
+            ? Text(
+                'No Photo Memo Found',
+                style: Theme.of(context).textTheme.headline6,
+              )
+            : ListView.builder(
+                itemCount: con.photoMemoList.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    margin: const EdgeInsets.all(8.0),
+                    elevation: 10,
+                    color: con.delIndexes.contains(index)
+                        ? Theme.of(context).highlightColor
+                        : Theme.of(context).scaffoldBackgroundColor,
+                    child: ListTile(
+                      leading: WebImage(
+                        url: con.photoMemoList[index].photoURL,
+                        context: context,
+                      ),
+                      trailing: Icon(Icons.arrow_right),
+                      title: Text(con.photoMemoList[index].title),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            con.photoMemoList[index].memo.length >= 40
+                                ? con.photoMemoList[index].memo.substring(
+                                      0,
+                                      40,
+                                    ) +
+                                    '...'
+                                : con.photoMemoList[index].memo,
+                          ),
+                          Text(
+                            'Created by : ${con.photoMemoList[index].createdBy}',
+                            style: GoogleFonts.inter(
+                              color: Colors.green,
+                              fontSize: 14,
                             ),
-                            Text(
-                              'Created by : ${con.photoMemoList[index].createdBy}',
-                              style: GoogleFonts.inter(
-                                color: Colors.green,
-                                fontSize: 14,
-                              ),
+                          ),
+                          Text(
+                            'SharedWith : ${con.photoMemoList[index].sharedWith}',
+                            style: GoogleFonts.inter(
+                              color: Colors.red,
+                              fontSize: 14,
                             ),
-                            Text(
-                              'SharedWith : ${con.photoMemoList[index].sharedWith}',
-                              style: GoogleFonts.inter(
-                                color: Colors.red,
-                                fontSize: 14,
-                              ),
+                          ),
+                          Text(
+                            'Timestamp : ${con.photoMemoList[index].timestamp}',
+                            style: GoogleFonts.inter(
+                              color: Colors.yellow,
+                              fontSize: 14,
                             ),
-                            Text(
-                              'Timestamp : ${con.photoMemoList[index].timestamp}',
-                              style: GoogleFonts.inter(
-                                color: Colors.yellow,
-                                fontSize: 14,
-                              ),
-                            ),
-                            StreamBuilder<QuerySnapshot>(
-                              stream: comments,
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                                if (snapshot.hasError) {
-                                  return Text('Something went wrong');
-                                } else if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return Text("Loading");
-                                } else {
-                                  return Container(
-                                    height: 80,
-                                    child: ListView( 
-                                      children: snapshot.data!.docs
-                                          .map((DocumentSnapshot document) {
-                                        Map<String, dynamic> data = document
-                                            .data()! as Map<String, dynamic>;
-                                        return GestureDetector(
-                                          onTap: () {
-                                            if (widget.photoMemoList[index]
-                                                    .createdBy ==
-                                                data['originalPoster']) {
-                                              return;
-                                            }
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return Dialog(
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20.0),
-                                                  ), //this right here
-                                                  child: Container(
-                                                    height: 200,
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                        8.0,
-                                                      ),
-                                                      child: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                              'Sender : ${data['originalPoster']}'),
-                                                          Text(
-                                                              'Comment : ${data['content']}'),
-                                                          Divider(
-                                                              height: 2,
-                                                              color:
-                                                                  Colors.red),
-                                                          Spacer(),
-                                                          Row(
-                                                            children: [
-                                                              Expanded(
-                                                                child:
-                                                                    TextFormField(
-                                                                  controller:
-                                                                      commentController,
-                                                                  decoration:
-                                                                      InputDecoration(
-                                                                    hintText:
-                                                                        'Reply to ${data['originalPoster']} ...',
-                                                                    enabledBorder:
-                                                                        OutlineInputBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              15),
-                                                                    ),
-                                                                    focusedBorder:
-                                                                        OutlineInputBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              15),
-                                                                    ),
+                          ),
+                          StreamBuilder<QuerySnapshot>(
+                            stream: comments,
+                            builder: (BuildContext context,
+                                AsyncSnapshot<QuerySnapshot> snapshot) {
+                              if (snapshot.hasError) {
+                                return Text('Something went wrong');
+                              } else if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Text("Loading");
+                              } else {
+                                return Container(
+                                  height: 80,
+                                  child: ListView(
+                                    children: snapshot.data!.docs
+                                        .map((DocumentSnapshot document) {
+                                      Map<String, dynamic> data = document
+                                          .data()! as Map<String, dynamic>;
+                                      return GestureDetector(
+                                        onTap: () {
+                                          if (widget.photoMemoList[index]
+                                                  .createdBy ==
+                                              data['originalPoster']) {
+                                            return;
+                                          }
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return Dialog(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20.0),
+                                                ), //this right here
+                                                child: Container(
+                                                  height: 200,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                      8.0,
+                                                    ),
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                            'Sender : ${data['originalPoster']}'),
+                                                        Text(
+                                                            'Comment : ${data['content']}'),
+                                                        Divider(
+                                                            height: 2,
+                                                            color: Colors.red),
+                                                        Expanded(
+                                                          child: Container(),
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Expanded(
+                                                              child:
+                                                                  TextFormField(
+                                                                controller:
+                                                                    commentController,
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                  hintText:
+                                                                      'Reply to ${data['originalPoster']} ...',
+                                                                  enabledBorder:
+                                                                      OutlineInputBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            15),
+                                                                  ),
+                                                                  focusedBorder:
+                                                                      OutlineInputBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            15),
                                                                   ),
                                                                 ),
                                                               ),
-                                                              IconButton(
-                                                                splashRadius:
-                                                                    25,
-                                                                splashColor:
-                                                                    Colors.blue,
-                                                                onPressed: () {
-                                                                  con.replyComment(
-                                                                      index);
-                                                                },
-                                                                icon: Icon(
-                                                                    Icons.send),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
+                                                            ),
+                                                            IconButton(
+                                                              splashRadius: 25,
+                                                              splashColor:
+                                                                  Colors.blue,
+                                                              onPressed: () {
+                                                                con.replyComment(
+                                                                    index);
+                                                              },
+                                                              icon: Icon(
+                                                                  Icons.send),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
-                                                );
-                                              },
-                                            );
-                                          },
-                                          child: ListTile(
-                                            title: widget.photoMemoList[index]
-                                                    .sharedWith
-                                                    .contains(
-                                                        data['originalPoster']) && widget.photoMemoList[index].createdBy == data['createdBy']
-                                                ? Text(
-                                                    'Sender : ${data['originalPoster']}',
-                                                  )
-                                                : Text(''),
-                                            subtitle: widget
-                                                    .photoMemoList[index]
-                                                    .sharedWith
-                                                    .contains(
-                                                        data['originalPoster'])&& widget.photoMemoList[index].createdBy == data['createdBy']
-                                                ? Text(
-                                                    'Comment : ${data['content']}')
-                                                : Text(''),
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                        onTap: () => con.onTap(index),
-                        onLongPress: () => con.onLongPress(index),
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        },
+                                        child: ListTile(
+                                          title: widget.photoMemoList[index]
+                                                      .sharedWith
+                                                      .contains(data[
+                                                          'originalPoster']) &&
+                                                  widget.photoMemoList[index]
+                                                          .createdBy ==
+                                                      data['createdBy']
+                                              ? Text(
+                                                  'Sender : ${data['originalPoster']}',
+                                                )
+                                              : Text(''),
+                                          subtitle: widget.photoMemoList[index]
+                                                      .sharedWith
+                                                      .contains(data[
+                                                          'originalPoster']) &&
+                                                  widget.photoMemoList[index]
+                                                          .createdBy ==
+                                                      data['createdBy']
+                                              ? Text(
+                                                  'Comment : ${data['content']}')
+                                              : Text(''),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                )),
+                      onTap: () => con.onTap(index),
+                      onLongPress: () => con.onLongPress(index),
+                    ),
+                  );
+                },
+              ),
+      ),
     );
   }
 }
@@ -378,10 +394,6 @@ class _Controller {
   }
 
   void replyComment(int index) {
-    if (state.widget.photoMemoList[index].createdBy !=
-        state.widget.photoMemoList[index].sharedWith.single) {
-      return;
-    }
     FirestoreController.replyComment(
         index, state.commentController, photoMemoList);
 
@@ -468,6 +480,12 @@ class _Controller {
           return 0;
       });
     });
+  }
+
+  void goRepliesPage() async {
+    Navigator.push(state.context, MaterialPageRoute(builder: (context) {
+      return RepliesComment(photoMemoList: state.widget.photoMemoList,user: state.widget.user, );
+    }));
   }
 
   void addButton() async {

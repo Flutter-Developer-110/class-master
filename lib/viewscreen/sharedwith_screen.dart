@@ -48,71 +48,7 @@ class _SharedWithState extends State<SharedWithScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Shared With ${widget.user.email}'),
-      ),
-      // body: SingleChildScrollView(
-      //   child: widget.photoMemoList.isEmpty
-      //       ? Text(
-      //           'No PhotoMemos shared with me',
-      //           style: Theme.of(context).textTheme.headline6,
-      //         )
-      //       : Column(
-      //           children: [
-      //             for (var photoMemo in widget.photoMemoList)
-      //               Card(
-      //                 elevation: 8.0,
-      //                 shape: RoundedRectangleBorder(
-      //                     borderRadius: BorderRadius.circular(16.0)),
-      //                 child: Column(
-      //                   crossAxisAlignment: CrossAxisAlignment.start,
-      //                   children: [
-      //                     Center(
-      //                       child: WebImage(
-      //                         url: photoMemo.photoURL,
-      //                         context: context,
-      //                         height: MediaQuery.of(context).size.height * 0.35,
-      //                       ),
-      //                     ),
-      //                     Text(
-      //                       photoMemo.title,
-      //                       style: Theme.of(context).textTheme.headline6,
-      //                     ),
-      //                     Text(photoMemo.memo),
-      //                     Text('Created by : ${photoMemo.createdBy}'),
-      //                     Text('Created at : ${photoMemo.timestamp}'),
-      //                     Text('Shared With : ${photoMemo.sharedWith}'),
-      //                     Text('Image Labels : ${photoMemo.imageLabels}'),
-      //                     SizedBox(height: 10),
-      //                     Row(
-      //                       children: [
-      //                         Expanded(
-      //                           child: TextFormField(
-      //                             maxLines: 1,
-      //                             controller: commentController,
-      //                             decoration: InputDecoration(
-      //                               hintText: 'Comment here ...',
-      //                               focusedBorder: OutlineInputBorder(
-      //                                 borderRadius: BorderRadius.circular(15),
-      //                               ),
-      //                               enabledBorder: OutlineInputBorder(
-      //                                 borderRadius: BorderRadius.circular(15),
-      //                               ),
-      //                             ),
-      //                           ),
-      //                         ),
-      //                         IconButton(
-      //                           onPressed: () async {
-      //                             con.addComment();
-      //                           },
-      //                           icon: Icon(Icons.send),
-      //                         ),
-      //                       ],
-      //                     ),
-      //                   ],
-      //                 ),
-      //               )
-      //           ],
-      //         ),
-      // ),
+      ), 
       body: Container(
         child: widget.photoMemoList.isEmpty
             ? Text('No PhotoMemos shared with me')
@@ -189,36 +125,7 @@ class _Controller {
   late _SharedWithState state;
   _Controller(this.state);
 
-  PhotoMemo photoMemo = PhotoMemo();
-
-  // CollectionReference commentsRef =
-  //     FirebaseFirestore.instance.collection(Constant.COMMENTS_COLLECTION);
-
-  // void addComment(int index) async {
-  //   String text = state.commentController[index].text;
-  //   print(text);
-  //   if (text.length <= 2) {
-  //     print('type sth more');
-  //     return;
-  //   }
-
-  //   Map<String, dynamic> newMap = Map();
-  //   newMap['content'] = text;
-  //   String timestamp = DateTime.now().toString();
-  //   newMap['timestamp'] = timestamp;
-  //   newMap['createdBy'] = state.widget.photoMemoList[index].createdBy;
-  //   newMap['originalPoster'] = FirebaseAuth.instance.currentUser!.email;
-  //   newMap['photo_memo_url'] = state.widget.photoMemoList[index].photoURL;
-  //   commentsRef.add(newMap).then((value) {
-  //     print(value);
-  //   });
-
-  //   resetValues(index);
-  // }
-
-  // resetValues(int index) {
-  //   state.commentController[index].clear();
-  // }
+  PhotoMemo photoMemo = PhotoMemo(); 
 
   void addComment(int index) async {
     FirestoreController.addComment(
