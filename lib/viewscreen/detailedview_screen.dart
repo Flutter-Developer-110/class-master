@@ -74,17 +74,13 @@ class _DetailedViewState extends State<DetailedViewScreen> {
                     child: CircleAvatar(
                       backgroundColor: Colors.white,
                       radius: 67,
-                      child: con.photo == null
-                          ? WebImage(
-                              url: con.tempMemo.photoURL,
-                              context: context,
-                              height: 100,
+                      backgroundImage: con.photo == null
+                          ? NetworkImage(
+                             con.tempMemo.photoURL,  
                             )
-                          : Image.file(
-                              con.photo!,
-                              width: 120,
-                              height: 120,
-                            )
+                          : FileImage(
+                              con.photo!, 
+                            ) as ImageProvider,
                     ),
                   ),
                   editMode

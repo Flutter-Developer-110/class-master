@@ -17,9 +17,11 @@ class FirestoreController {
     return ref.id; //doc id
   }
 
-//Comment's Firestore
-  static Future<void> addComment(int index,
-      List<TextEditingController> commentController, List<PhotoMemo> photoMemoList ) async {
+//Adding a Comment to the Firestore
+  static Future<void> addComment(
+      int index,
+      List<TextEditingController> commentController,
+      List<PhotoMemo> photoMemoList) async {
     CollectionReference commentsRef =
         FirebaseFirestore.instance.collection(Constant.COMMENTS_COLLECTION);
     String text = commentController[index].text;
@@ -35,11 +37,37 @@ class FirestoreController {
     newMap['timestamp'] = timestamp;
     newMap['createdBy'] = photoMemoList[index].createdBy;
     newMap['originalPoster'] = FirebaseAuth.instance.currentUser!.email;
-    newMap['photo_memo_url'] = photoMemoList[index].photoURL ;
+    newMap['photo_memo_url'] = photoMemoList[index].photoURL;
     commentsRef.add(newMap).then((value) {
       print(value);
     });
     commentController[index].clear();
+  }
+
+  //Replying Comment's to the Firestore
+  static Future<void> replyComment(
+      int index,
+      TextEditingController commentController,
+      List<PhotoMemo> photoMemoList) async {
+    CollectionReference commentsRef =
+        FirebaseFirestore.instance.collection(Constant.REPLIES_COLLECTION);
+    String text = commentController.text;
+    print(text);
+    if (text.length <= 2) {
+      print('type sth more');
+      return;
+    }
+
+    Map<String, dynamic> newMap = Map();
+    newMap['content'] = text;
+    String timestamp = DateTime.now().toString();
+    newMap['timestamp'] = timestamp;
+    newMap['sender'] = FirebaseAuth.instance.currentUser!.email;
+    newMap['receiver'] = photoMemoList[index].createdBy; 
+    commentsRef.add(newMap).then((value) {
+      print(value);
+    });
+    commentController.clear();
   }
 
   static Future<List<PhotoMemo>> getPhotoMemoList({

@@ -35,11 +35,24 @@ class _UserHomeState extends State<UserHomeScreen> {
   @override
   late _Controller con;
   GlobalKey<FormState> formKey = GlobalKey();
+  Stream<QuerySnapshot> comments =
+      FirebaseFirestore.instance.collection('comments').snapshots();
+
+  late TextEditingController commentController;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     con = _Controller(this);
+
+    commentController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    commentController.dispose();
+    super.dispose();
   }
 
   void render(fn) => setState(fn);
@@ -165,7 +178,136 @@ class _UserHomeState extends State<UserHomeScreen> {
                                 fontSize: 14,
                               ),
                             ),
-                           
+                            StreamBuilder<QuerySnapshot>(
+                              stream: comments,
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                                if (snapshot.hasError) {
+                                  return Text('Something went wrong');
+                                } else if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Text("Loading");
+                                } else {
+                                  return Container(
+                                    height: 80,
+                                    child: ListView( 
+                                      children: snapshot.data!.docs
+                                          .map((DocumentSnapshot document) {
+                                        Map<String, dynamic> data = document
+                                            .data()! as Map<String, dynamic>;
+                                        return GestureDetector(
+                                          onTap: () {
+                                            if (widget.photoMemoList[index]
+                                                    .createdBy ==
+                                                data['originalPoster']) {
+                                              return;
+                                            }
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return Dialog(
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20.0),
+                                                  ), //this right here
+                                                  child: Container(
+                                                    height: 200,
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                        8.0,
+                                                      ),
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                              'Sender : ${data['originalPoster']}'),
+                                                          Text(
+                                                              'Comment : ${data['content']}'),
+                                                          Divider(
+                                                              height: 2,
+                                                              color:
+                                                                  Colors.red),
+                                                          Spacer(),
+                                                          Row(
+                                                            children: [
+                                                              Expanded(
+                                                                child:
+                                                                    TextFormField(
+                                                                  controller:
+                                                                      commentController,
+                                                                  decoration:
+                                                                      InputDecoration(
+                                                                    hintText:
+                                                                        'Reply to ${data['originalPoster']} ...',
+                                                                    enabledBorder:
+                                                                        OutlineInputBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              15),
+                                                                    ),
+                                                                    focusedBorder:
+                                                                        OutlineInputBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              15),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              IconButton(
+                                                                splashRadius:
+                                                                    25,
+                                                                splashColor:
+                                                                    Colors.blue,
+                                                                onPressed: () {
+                                                                  con.replyComment(
+                                                                      index);
+                                                                },
+                                                                icon: Icon(
+                                                                    Icons.send),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            );
+                                          },
+                                          child: ListTile(
+                                            title: widget.photoMemoList[index]
+                                                    .sharedWith
+                                                    .contains(
+                                                        data['originalPoster']) && widget.photoMemoList[index].createdBy == data['createdBy']
+                                                ? Text(
+                                                    'Sender : ${data['originalPoster']}',
+                                                  )
+                                                : Text(''),
+                                            subtitle: widget
+                                                    .photoMemoList[index]
+                                                    .sharedWith
+                                                    .contains(
+                                                        data['originalPoster'])&& widget.photoMemoList[index].createdBy == data['createdBy']
+                                                ? Text(
+                                                    'Comment : ${data['content']}')
+                                                : Text(''),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
                           ],
                         ),
                         onTap: () => con.onTap(index),
@@ -233,6 +375,17 @@ class _Controller {
     }
     MyDialog.circularProgressStop(state.context);
     state.render(() => delIndexes.clear());
+  }
+
+  void replyComment(int index) {
+    if (state.widget.photoMemoList[index].createdBy !=
+        state.widget.photoMemoList[index].sharedWith.single) {
+      return;
+    }
+    FirestoreController.replyComment(
+        index, state.commentController, photoMemoList);
+
+    state.commentController.clear();
   }
 
   void cancelDelete() {
@@ -335,5 +488,5 @@ class _Controller {
     }
     Navigator.of(state.context).pop(); //close the drawer
     Navigator.of(state.context).pop(); //pop from the user
-  } 
+  }
 }

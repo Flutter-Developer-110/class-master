@@ -151,9 +151,10 @@ class _SharedWithState extends State<SharedWithScreen> {
                           Row(
                             children: [
                               Expanded(
-                                child: TextFormField(
+                                child: TextFormField( 
                                   controller: commentController[index],
                                   decoration: InputDecoration(
+                                    hintText: 'Comment here ...',
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(15),
                                     ),
@@ -172,7 +173,7 @@ class _SharedWithState extends State<SharedWithScreen> {
                                 icon: Icon(Icons.send),
                               ),
                             ],
-                          )
+                          ),
                         ],
                       ),
                     ),

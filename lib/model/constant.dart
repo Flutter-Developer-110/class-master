@@ -5,7 +5,8 @@ class Constant {
   static const DARKMODE = true;
   static const PHOTO_IMAGES_FOLRDER = 'photo_images';
   static const PHOTOMEMO_COLLECTION = 'photomemo_collection';
-  static const COMMENTS_COLLECTION = 'comments';
+  static const COMMENTS_COLLECTION = 'comments'; 
+  static const REPLIES_COLLECTION = 'replies'; 
 }
 
 enum ARGS {
