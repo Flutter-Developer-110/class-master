@@ -48,7 +48,7 @@ class _SharedWithState extends State<SharedWithScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Shared With ${widget.user.email}'),
-      ), 
+      ),
       body: Container(
         child: widget.photoMemoList.isEmpty
             ? Text('No PhotoMemos shared with me')
@@ -87,7 +87,7 @@ class _SharedWithState extends State<SharedWithScreen> {
                           Row(
                             children: [
                               Expanded(
-                                child: TextFormField( 
+                                child: TextFormField(
                                   controller: commentController[index],
                                   decoration: InputDecoration(
                                     hintText: 'Comment here ...',
@@ -104,7 +104,7 @@ class _SharedWithState extends State<SharedWithScreen> {
                                 splashRadius: 25,
                                 splashColor: Colors.blue,
                                 onPressed: () {
-                                  con.addComment(index);
+                                  con.save(index);
                                 },
                                 icon: Icon(Icons.send),
                               ),
@@ -125,10 +125,21 @@ class _Controller {
   late _SharedWithState state;
   _Controller(this.state);
 
-  PhotoMemo photoMemo = PhotoMemo(); 
+  PhotoMemo photoMemo = PhotoMemo();
+  Comments comments = Comments();
 
-  void addComment(int index) async {
-    FirestoreController.addComment(
-        index, state.commentController, state.widget.photoMemoList);
+  void save(int index) async {
+    if (state.commentController[index].text.isEmpty) {
+      return;
+    }
+    comments.content = state.commentController[index].text;
+    comments.createdBy = state.widget.photoMemoList[index].createdBy;
+    comments.originalPoster = FirebaseAuth.instance.currentUser!.email ?? '';
+    comments.timestamp = DateTime.now();
+
+    String docId = await FirestoreController.addComment(comments: comments);
+    comments.docId = docId;
+
+    state.commentController[index].clear();
   }
 }

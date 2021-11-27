@@ -17,32 +17,65 @@ class FirestoreController {
     return ref.id; //doc id
   }
 
-//Adding a Comment to the Firestore
-  static Future<void> addComment(
-      int index,
-      List<TextEditingController> commentController,
-      List<PhotoMemo> photoMemoList) async {
-    CollectionReference commentsRef =
-        FirebaseFirestore.instance.collection(Constant.COMMENTS_COLLECTION);
-    String text = commentController[index].text;
-    print(text);
-    if (text.length <= 2) {
-      print('type sth more');
-      return;
-    }
 
-    Map<String, dynamic> newMap = Map();
-    newMap['content'] = text;
-    String timestamp = DateTime.now().toString();
-    newMap['timestamp'] = timestamp;
-    newMap['createdBy'] = photoMemoList[index].createdBy;
-    newMap['originalPoster'] = FirebaseAuth.instance.currentUser!.email;
-    newMap['photo_memo_url'] = photoMemoList[index].photoURL;
-    commentsRef.add(newMap).then((value) {
-      print(value);
-    });
-    commentController[index].clear();
+  static Future<String> addComment({
+    required Comments comments,
+  }) async {
+    DocumentReference ref = await FirebaseFirestore.instance
+        .collection(Constant.COMMENTS_COLLECTION)
+        .add(comments.toFirestoreDoc());
+    return ref.id; 
   }
+
+  static Future<List<Comments>> getComment({
+    required String email,
+  }) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection(Constant.COMMENTS_COLLECTION)
+        //.collection(Constant.PHOTOMEMO_COLLECTION)
+        .where(Comments.CREATED_BY, isEqualTo: email)
+        .orderBy(Comments.TIMESTAMP, descending: true)
+        .get();
+
+    var result = <Comments>[];
+    querySnapshot.docs.forEach((doc) {
+      if (doc.data() != null) {
+        var document = doc.data() as Map<String, dynamic>;
+        var p = Comments.fromFirestoreDoc(doc: document, docId: doc.id);
+        if (p != null) {
+          result.add(p);
+        }
+      }
+    });
+    return result;
+  }
+
+// //Adding a Comment to the Firestore
+//   static Future<void> addComment(
+//       int index,
+//       List<TextEditingController> commentController,
+//       List<PhotoMemo> photoMemoList) async {
+//     CollectionReference commentsRef =
+//         FirebaseFirestore.instance.collection(Constant.COMMENTS_COLLECTION);
+//     String text = commentController[index].text;
+//     print(text);
+//     if (text.length <= 2) {
+//       print('type sth more');
+//       return;
+//     }
+
+//     Map<String, dynamic> newMap = Map();
+//     newMap['content'] = text;
+//     String timestamp = DateTime.now().toString();
+//     newMap['timestamp'] = timestamp;
+//     newMap['createdBy'] = photoMemoList[index].createdBy;
+//     newMap['originalPoster'] = FirebaseAuth.instance.currentUser!.email;
+//     newMap['photo_memo_url'] = photoMemoList[index].photoURL;
+//     commentsRef.add(newMap).then((value) {
+//       print(value);
+//     });
+//     commentController[index].clear();
+//   }
 
   //Replying Comment's to the Firestore
   static Future<void> replyComment(

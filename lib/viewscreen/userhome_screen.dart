@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lesson3/controller/cloudstorage_controller.dart';
 import 'package:lesson3/controller/firebaseauth_controller.dart';
 import 'package:lesson3/controller/firestore_controller.dart';
+import 'package:lesson3/model/comments.dart';
 import 'package:lesson3/model/constant.dart';
 import 'package:lesson3/model/photomemo.dart';
 import 'package:lesson3/viewscreen/addnewphotomemo_screen.dart';
@@ -36,13 +37,17 @@ class _UserHomeState extends State<UserHomeScreen> {
   @override
   late _Controller con;
   GlobalKey<FormState> formKey = GlobalKey();
-  Stream<QuerySnapshot> comments =
+  Stream<QuerySnapshot> commentsRef =
       FirebaseFirestore.instance.collection('comments').snapshots();
 
   Stream<QuerySnapshot> replies =
       FirebaseFirestore.instance.collection('replies').snapshots();
 
+  Comments comments = Comments(); 
+  String commentsLength = '';
+
   late TextEditingController commentController;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -50,6 +55,7 @@ class _UserHomeState extends State<UserHomeScreen> {
     con = _Controller(this);
 
     commentController = TextEditingController();
+    commentsLength = commentsRef.length.toString();
   }
 
   @override
@@ -188,8 +194,18 @@ class _UserHomeState extends State<UserHomeScreen> {
                               fontSize: 14,
                             ),
                           ),
+                          Stack(
+                            children: [
+                              commentsLength == commentsRef.length.toString() ? Icon(Icons.chat) : Icon(Icons.new_label_outlined),
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: Text('${comments.originalPoster.length}'),
+                              )
+                            ],
+                          ),
                           StreamBuilder<QuerySnapshot>(
-                            stream: comments,
+                            stream: commentsRef,
                             builder: (BuildContext context,
                                 AsyncSnapshot<QuerySnapshot> snapshot) {
                               if (snapshot.hasError) {
@@ -484,7 +500,10 @@ class _Controller {
 
   void goRepliesPage() async {
     Navigator.push(state.context, MaterialPageRoute(builder: (context) {
-      return RepliesComment(photoMemoList: state.widget.photoMemoList,user: state.widget.user, );
+      return RepliesComment(
+        photoMemoList: state.widget.photoMemoList,
+        user: state.widget.user,
+      );
     }));
   }
 
